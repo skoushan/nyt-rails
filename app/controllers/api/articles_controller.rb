@@ -4,7 +4,7 @@ module Api
     private
 
     def article_params
-      params.permit(:title)
+      params.require(:article).permit(:title)
     end
 
     def query_params

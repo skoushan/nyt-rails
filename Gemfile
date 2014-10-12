@@ -29,6 +29,8 @@ gem 'bson_ext'
 
 gem 'kaminari' # adds pagination to ActiveModels
 
+gem 'rest_client'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
