@@ -27,6 +27,8 @@ gem 'spring',        group: :development
 gem 'mongo_mapper'
 gem 'bson_ext'
 
+gem 'kaminari' # adds pagination to ActiveModels
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
