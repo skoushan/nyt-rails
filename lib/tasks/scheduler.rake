@@ -19,6 +19,21 @@ namespace :scheduler do
     end
   end
 
+  desc "Retrieve sections"
+  task retrieve_sections: :environment do
+    response = RestClient.get 'http://api.nytimes.com/svc/news/v3/content/section-list.json?api-key=5fa60494024b4c3c13ecb72011023ad8:11:69972922'
+    response = JSON.parse(response)
+    response['results'].each do |section|
+      retrieved = Section.where(:section => section['section']).all[0]
+      if retrieved
+        retrieved.set(section)
+      else
+        section = Section.create section
+        section.save
+      end
+    end
+  end
+
   # creates a 24 character hash using the djb2a algorithm + appending 0's
   def djb2a str
     hash = 5381

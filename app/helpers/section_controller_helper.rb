@@ -1,0 +1,2 @@
+module SectionControllerHelper
+end
