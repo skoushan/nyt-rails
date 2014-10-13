@@ -13,5 +13,8 @@ module Api
       params.permit(:section)
     end
 
+    def query_sort
+      :created_date.desc
+    end
   end
 end

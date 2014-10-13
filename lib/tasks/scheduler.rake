@@ -3,15 +3,16 @@ require 'digest/sha1'
 namespace :scheduler do
   desc "TODO"
   task retrieve_articles: :environment do
-    response = RestClient.get 'http://api.nytimes.com/svc/news/v3/content/all/all/1.json?api-key=sample-key'
+    response = RestClient.get 'http://api.nytimes.com/svc/news/v3/content/all/all/.json?api-key=5fa60494024b4c3c13ecb72011023ad8:11:69972922'
     response = JSON.parse(response)
     response['results'].each do |article|
-      id = djb2a article['url']
-      retrieved = Article.find(id)
+      retrieved = Article.where(:url => article['url']).all[0]
+      # id = djb2a article['url']
+      # retrieved = Article.find(id)
       if retrieved
         retrieved.set(article)
       else
-        article["_id"] = BSON::ObjectId.from_string id.to_s
+        # article["_id"] = BSON::ObjectId.from_string id.to_s
         article = Article.create article
         article.save!
       end
