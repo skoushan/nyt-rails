@@ -34,6 +34,40 @@ namespace :scheduler do
     end
   end
 
+  desc 'Retrieve popularity'
+  task retrieve_popularity: :environment do
+    popularity_types = [
+        { url: 'mostviewed',
+          name: 'view'} ,
+        { url: 'mostshared',
+          name: 'shared'}]
+
+    popularity_types.each do |popularity_type|
+      offset = 0
+      loop do
+        response = RestClient.get "http://api.nytimes.com/svc/mostpopular/v2/#{popularity_type[:url]}/all-sections/1.json?offset=#{offset}&api-key=7e50471e4abb9b539dbf73e6c69cb4b4:18:69972922"
+        response = JSON.parse(response)
+        response['results'].each_with_index do |article, index|
+          retrieved = Article.where(url: article['url']).all
+          if retrieved && retrieved[0]
+            rank = offset + index + 1
+            retrieved = retrieved[0]
+            retrieved["prev_#{popularity_type[:name]}_rank"] = retrieved["cur_#{popularity_type[:name]}_rank"]
+            retrieved["cur_#{popularity_type[:name]}_rank"] = rank
+            if retrieved["peak_#{popularity_type[:name]}_rank"] == nil or rank > retrieved["peak_#{popularity_type[:name]}_rank"]
+              retrieved["peak_#{popularity_type[:name]}_rank"] = rank
+            end
+            puts "#{rank}: #{retrieved.title}"
+            retrieved.save!
+          end
+        end
+        count = response['results'].length
+        offset += count
+        break if response['num_results'] - offset - count <= 0
+      end
+    end
+  end
+
   # creates a 24 character hash using the djb2a algorithm + appending 0's
   def djb2a str
     hash = 5381
