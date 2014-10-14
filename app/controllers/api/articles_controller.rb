@@ -14,7 +14,7 @@ module Api
     end
 
     def query_sort
-      :created_date.desc
+      :score.desc
     end
   end
 end
