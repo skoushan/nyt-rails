@@ -76,21 +76,21 @@ namespace :scheduler do
 
   def calculate_scores
     Article.all.each do |article|
-      prev_view = article['prev_view_rank'] == 0 ? 0 : 1/article['prev_view_rank']
-      prev_share = article['prev_share_rank'] == 0 ? 0 : 1/article['prev_share_rank']
+      prev_view = article['prev_view_rank'] == 0 ? 0 : 1.0/article['prev_view_rank']
+      prev_share = article['prev_share_rank'] == 0 ? 0 : 1.0/article['prev_share_rank']
       prev_pop = 0.5*prev_view + 0.5*prev_share
 
-      cur_view = article['cur_view_rank'] == 0 ? 0 : 1/article['cur_view_rank']
-      cur_share = article['cur_share_rank'] == 0 ? 0 : 1/article['cur_share_rank']
+      cur_view = article['cur_view_rank'] == 0 ? 0 : 1.0/article['cur_view_rank']
+      cur_share = article['cur_share_rank'] == 0 ? 0 : 1.0/article['cur_share_rank']
       cur_pop = 0.5*cur_view + 0.5*cur_share
 
-      peak_view = article['peak_view_rank'] == 0 ? 0 : 1/article['peak_view_rank']
-      peak_share = article['peak_share_rank'] == 0 ? 0 : 1/article['peak_share_rank']
+      peak_view = article['peak_view_rank'] == 0 ? 0 : 1.0/article['peak_view_rank']
+      peak_share = article['peak_share_rank'] == 0 ? 0 : 1.0/article['peak_share_rank']
       peak_pop = 0.5*peak_view + 0.5*peak_share
 
       delta_pop = cur_pop - prev_pop
 
-      article['score'] = article['updated_date'].to_i + 1000*60*60*(18*cur_pop + 8*delta_pop + 8*peak_pop)
+      article['score'] = article['updated_date'].to_i + 60*60*(24*cur_pop + 12*delta_pop + 12*peak_pop)
       article.save!
     end
   end
