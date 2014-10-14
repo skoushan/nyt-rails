@@ -1,27 +1,10 @@
 module Api
   class BaseController < ApplicationController
     protect_from_forgery with: :null_session
-    before_action :set_resource, only: [:destroy, :show, :update]
+    before_action :set_resource, only: [:show]
     respond_to :json
 
-    # POST /api/{plural_resource_name}
-    def create
-      set_resource(resource_class.new(resource_params))
-
-      if get_resource.save
-        render :show, status: :created
-      else
-        render json: get_resource.errors, status: :unprocessable_entity
-      end
-    end
-
-  # DELETE /api/{plural_resource_name}/1
-    def destroy
-      get_resource.destroy
-      head :no_content
-    end
-
-  # GET /api/{plural_resource_name}
+    # GET /api/{plural_resource_name}
     def index
       plural_resource_name = "@#{resource_name.pluralize}"
       resources = resource_class.where(query_params).sort(query_sort)
@@ -32,19 +15,37 @@ module Api
       respond_with instance_variable_get(plural_resource_name)
     end
 
-  # GET /api/{plural_resource_name}/1
+    # GET /api/{plural_resource_name}/1
     def show
       respond_with get_resource
     end
 
-  # PATCH/PUT /api/{plural_resource_name}/1
-    def update
-      if get_resource.update(resource_params)
-        render :show
-      else
-        render json: get_resource.errors, status: :unprocessable_entity
-      end
-    end
+    ### POST, DELETE, and UPDATE methods, for later
+    # POST /api/{plural_resource_name}
+    # def create
+    #   set_resource(resource_class.new(resource_params))
+    #
+    #   if get_resource.save
+    #     render :show, status: :created
+    #   else
+    #     render json: get_resource.errors, status: :unprocessable_entity
+    #   end
+    # end
+
+    # # DELETE /api/{plural_resource_name}/1
+    # def destroy
+    #   get_resource.destroy
+    #   head :no_content
+    # end
+
+    # # PATCH/PUT /api/{plural_resource_name}/1
+    # def update
+    #   if get_resource.update(resource_params)
+    #     render :show
+    #   else
+    #     render json: get_resource.errors, status: :unprocessable_entity
+    #   end
+    # end
 
     private
 

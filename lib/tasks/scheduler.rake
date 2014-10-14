@@ -2,7 +2,7 @@ require 'digest/sha1'
 require 'date'
 
 namespace :scheduler do
-  desc "TODO"
+  desc "Retrieve articles"
   task retrieve_articles: :environment do
     response = RestClient.get 'http://api.nytimes.com/svc/news/v3/content/all/all/.json?api-key=5fa60494024b4c3c13ecb72011023ad8:11:69972922'
     response = JSON.parse(response)
@@ -24,13 +24,14 @@ namespace :scheduler do
   task retrieve_sections: :environment do
     response = RestClient.get 'http://api.nytimes.com/svc/news/v3/content/section-list.json?api-key=5fa60494024b4c3c13ecb72011023ad8:11:69972922'
     response = JSON.parse(response)
-    response['results'].each do |section|
+    response['results'].each_with_index do |section|
       retrieved = Section.where(:section => section['section']).all[0]
       if retrieved
         retrieved.set(section)
       else
         section = Section.create section
-        section.save
+        section['order'] = Section.count + 1
+        section.save!
       end
     end
   end
