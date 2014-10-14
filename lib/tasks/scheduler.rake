@@ -87,7 +87,7 @@ namespace :scheduler do
 
       delta_pop = cur_pop - prev_pop
 
-      article['score'] = article['updated_date'].to_i + 6*60*60*cur_pop_rank + 3*60*60*delta_pop + 1*60*60*peak_pop
+      article['score'] = article['updated_date'].to_i + 18*60*60*cur_pop + 8*60*60*delta_pop + 4*60*60*peak_pop
       article.save!
     end
   end
