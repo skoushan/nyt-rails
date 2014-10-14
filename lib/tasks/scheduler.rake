@@ -1,4 +1,5 @@
 require 'digest/sha1'
+require 'date'
 
 namespace :scheduler do
   desc "TODO"
@@ -40,7 +41,7 @@ namespace :scheduler do
         { url: 'mostviewed',
           name: 'view'} ,
         { url: 'mostshared',
-          name: 'shared'}]
+          name: 'share'}]
 
     popularity_types.each do |popularity_type|
       offset = 0
@@ -65,6 +66,29 @@ namespace :scheduler do
         offset += count
         break if response['num_results'] - offset - count <= 0
       end
+    end
+  end
+
+  desc 'Calculate scores'
+  task calculate_scores: :environment do
+    calculate_scores
+  end
+
+  def calculate_scores
+    Article.all.each do |article|
+      prev_pop_rank = 0.5*article['prev_view_rank'] + 0.5*article['prev_share_rank']
+      prev_pop = prev_pop_rank == 0 ? 0 : 1/prev_pop_rank
+
+      cur_pop_rank = 0.5*article['cur_view_rank'] + 0.5*article['cur_share_rank']
+      cur_pop = cur_pop_rank == 0 ? 0 : 1/cur_pop_rank
+
+      peak_pop_rank = 0.5*article['peak_view_rank'] + 0.5*article['peak_share_rank']
+      peak_pop = peak_pop_rank == 0 ? 0 : 1/peak_pop_rank
+
+      delta_pop = cur_pop - prev_pop
+
+      article['score'] = article['updated_date'].to_i + 12*60*60*cur_pop_rank + 6*60*60*delta_pop + 2*60*60*peak_pop
+      article.save!
     end
   end
 
