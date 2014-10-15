@@ -18,4 +18,5 @@ class Article
   key :created_date, Time
   key :published_date, Time
 
+  key :multimedia, Array
 end
