@@ -20,7 +20,10 @@ module Api
       respond_with get_resource
     end
 
-    ### POST, DELETE, and UPDATE methods, for later
+    ###############################################
+    # POST, DELETE, and UPDATE methods, for later #
+    ###############################################
+
     # POST /api/{plural_resource_name}
     # def create
     #   set_resource(resource_class.new(resource_params))
