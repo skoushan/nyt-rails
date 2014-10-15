@@ -96,6 +96,16 @@ namespace :scheduler do
     end
   end
 
+  desc 'Multimedia to array'
+  task fix_multimedia: :environment do
+    Article.all.each do |article|
+      if article[:multimedia] == ""
+        article[:multimedia] = []
+        article.save!
+      end
+    end
+  end
+
   # creates a 24 character hash using the djb2a algorithm + appending 0's
   def djb2a str
     hash = 5381
