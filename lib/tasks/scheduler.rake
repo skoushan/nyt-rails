@@ -87,7 +87,7 @@ namespace :scheduler do
 
       trending_factor = cur_pop - prev_pop
 
-      article['score'] = article['created_date'].to_i + 20*60*60*(24*cur_pop + 12*trending_factor + 12*peak_pop)
+      article['score'] = article['created_date'].to_i + 5*60*60*(24*cur_pop + 12*trending_factor + 12*peak_pop)
       article.save!
     end
   end
