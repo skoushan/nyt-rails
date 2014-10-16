@@ -78,24 +78,47 @@ namespace :scheduler do
     calculate_scores
   end
 
+  def calculate_pop(article, type, lowest)
+    view = article["#{type}_view_rank".to_sym] == 0 ? 0 : (lowest["#{type}_view"] - article["#{type}_view_rank".to_sym])/(lowest["#{type}_view"] - 1.0)
+
+    share = article["#{type}_share_rank".to_sym] == 0 ? 0 : (lowest["#{type}_share"] - article["#{type}_share_rank".to_sym])/(lowest["#{type}_share"] - 1.0)
+
+    pop = 0.5*view + 0.5*share
+    pop
+  end
+
   def calculate_scores
-    Article.all.each do |article|
-      # convert rankings (lower is better) to a popularity measure (higher is better) by inverting it
-      prev_view = article['prev_view_rank'] == 0 ? 0 : 1.0/article['prev_view_rank']
-      prev_share = article['prev_share_rank'] == 0 ? 0 : 1.0/article['prev_share_rank']
-      prev_pop = 0.5*prev_view + 0.5*prev_share
+    newest = Article.sort(:created_date.desc).first[:created_date]
+    oldest = Article.sort(:created_date.asc).first[:created_date]
 
-      cur_view = article['cur_view_rank'] == 0 ? 0 : 1.0/article['cur_view_rank']
-      cur_share = article['cur_share_rank'] == 0 ? 0 : 1.0/article['cur_share_rank']
-      cur_pop = 0.5*cur_view + 0.5*cur_share
+    as = ['prev', 'cur', 'peak']
+    bs = ['view', 'share']
 
-      peak_view = article['peak_view_rank'] == 0 ? 0 : 1.0/article['peak_view_rank']
-      peak_share = article['peak_share_rank'] == 0 ? 0 : 1.0/article['peak_share_rank']
-      peak_pop = 0.5*peak_view + 0.5*peak_share
+    lowest = Hash.new
 
+    as.each do |a|
+      bs.each do |b|
+        lowest["#{a}_#{b}"] = Article.sort("#{a}_#{b}_rank".to_sym.desc).first["#{a}_#{b}_rank".to_sym]
+      end
+    end
+
+    total = Article.count
+
+    Article.sort(:created_date.desc).all.each_with_index do |article, index|
+      puts "#{index + 1} of #{total}"
+      prev_pop = calculate_pop(article, 'prev', lowest)
+      cur_pop = calculate_pop(article, 'cur', lowest)
+      peak_pop = calculate_pop(article, 'peak', lowest)
       trending_factor = cur_pop - prev_pop
 
-      article['score'] = article['created_date'].to_i + 4*60*60*(24*cur_pop + 24*trending_factor + 12*peak_pop)
+      popularity = (3*cur_pop + trending_factor + peak_pop)/5
+
+      recentness = (article[:created_date].to_f - oldest.to_f)/(newest.to_f - oldest.to_f)
+
+      score = (0.5*recentness + 0.1*popularity + 0.3*recentness*popularity)*1000000000000
+      article['score'] = score
+      article['popularity'] = popularity*1000000000000
+      article['trending'] = trending_factor*1000000000000
       article.save!
     end
   end
