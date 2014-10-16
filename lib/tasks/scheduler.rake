@@ -4,15 +4,27 @@ require 'date'
 namespace :scheduler do
   desc "Retrieves the 20 most recent articles from the Newswire API. This happens every ten minutes. It works assuming that articles are not producer faster than 2 per minute (on average)."
   task retrieve_articles: :environment do
-    response = RestClient.get 'http://api.nytimes.com/svc/news/v3/content/all/all/.json?api-key=5fa60494024b4c3c13ecb72011023ad8:11:69972922'
-    response = JSON.parse(response)
-    response['results'].each do |article|
-      retrieved = Article.where(:url => article['url']).all[0] # safe to assume there is only one because this field is set to be unique
-      if retrieved
-        retrieved.set(article) # update article
-      else
-        article = Article.create article
-        article.save!
+    offset = 0
+    loop do
+      begin
+        response = RestClient.get "http://api.nytimes.com/svc/news/v3/content/all/all/.json?offset=#{offset}&api-key=5fa60494024b4c3c13ecb72011023ad8:11:69972922"
+        response = JSON.parse(response)
+        last_article = nil
+        response['results'].each do |article|
+          retrieved = Article.where(:url => article['url']).all[0] # safe to assume there is only one because this field is set to be unique
+          if retrieved
+            retrieved.set(article) # update article
+            last_article = retrieved
+          else
+            article = Article.create article
+            article.save!
+            last_article = article
+          end
+        end
+        offset += 20
+        break if last_article == nil or last_article[:created_date] < 1.days.ago
+      rescue => e
+        break if e.response.code != 500
       end
     end
   end
