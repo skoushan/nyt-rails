@@ -5,9 +5,10 @@ module Api
 
     def query_params
       if ['Top Stories', 'Most Popular', 'Trending'].include? params[:section]
-        params.delete(:section)
+        params.permit(:url, :title)
+      else
+        params.permit(:section, :url, :title)
       end
-      params.permit(:section, :url, :title)
     end
 
     def query_sort
