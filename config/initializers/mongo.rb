@@ -1,4 +1,4 @@
-if ENV["MONGOLAB_URI"]
+if Rails.env.production? and ENV["MONGOLAB_URI"]
   uri = URI.parse(ENV["MONGOLAB_URI"])
   MongoMapper.connection = Mongo::Connection.from_uri(ENV["MONGOLAB_URI"])
   MongoMapper.database = uri.path.gsub(/^\//, '')

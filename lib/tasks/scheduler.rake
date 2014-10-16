@@ -19,17 +19,13 @@ namespace :scheduler do
 
   desc "Retrieves all the sections from the Newswire API."
   task retrieve_sections: :environment do
+    Section.destroy_all
     response = RestClient.get 'http://api.nytimes.com/svc/news/v3/content/section-list.json?api-key=5fa60494024b4c3c13ecb72011023ad8:11:69972922'
     response = JSON.parse(response)
     response['results'].each_with_index do |section|
-      retrieved = Section.where(:section => section['section']).all[0] # safe to assume there is only one because this field is set to be unique
-      if retrieved
-        retrieved.set(section)
-      else
-        section = Section.create section
-        section['order'] = Section.count + 1
-        section.save!
-      end
+      section = Section.create section
+      section['order'] = Section.count
+      section.save!
     end
   end
 
@@ -95,7 +91,7 @@ namespace :scheduler do
   desc "Converts empty strings to arrays (that's how Times returns it to us)"
   task fix_multimedia: :environment do
     Article.all.each do |article|
-      if article[:multimedia] == ""
+      if article[:multimedia] == ''
         article[:multimedia] = []
         article.save!
       end

@@ -4,14 +4,20 @@ module Api
     private
 
     def query_params
-      if params[:section] == 'Top Stories'
+      if ['Top Stories', 'Most Popular', 'Trending'].include? params[:section]
         params.delete(:section)
       end
       params.permit(:section, :url, :title)
     end
 
     def query_sort
-      :score.desc
+      if params[:section] == 'Most Popular'
+        :popularity.desc
+      elsif params[:section] == 'Trending'
+        :trending.desc
+      else
+        :score.desc
+      end
     end
   end
 end

@@ -13,6 +13,8 @@ class Article
   key :peak_share_rank, Integer, :default => 0
 
   key :score, Integer, :default => 0
+  key :popularity, Integer, :default => 0
+  key :trending, Integer, :default => 0
 
   key :updated_date, Time
   key :created_date, Time
