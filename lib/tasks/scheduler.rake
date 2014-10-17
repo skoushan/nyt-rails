@@ -59,7 +59,7 @@ namespace :scheduler do
             rank = offset + index + 1 # rank starts at 1
             retrieved["prev_#{popularity_type[:name]}_rank"] = retrieved["cur_#{popularity_type[:name]}_rank"]
             retrieved["cur_#{popularity_type[:name]}_rank"] = rank
-            if retrieved["peak_#{popularity_type[:name]}_rank"] == nil or rank < retrieved["peak_#{popularity_type[:name]}_rank"]
+            if retrieved["peak_#{popularity_type[:name]}_rank"] == nil or retrieved["peak_#{popularity_type[:name]}_rank"] == 0 or rank < retrieved["peak_#{popularity_type[:name]}_rank"]
               retrieved["peak_#{popularity_type[:name]}_rank"] = rank
             end
             puts "#{popularity_type[:name]} ##{rank}: #{retrieved.title}"

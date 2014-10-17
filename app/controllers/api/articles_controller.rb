@@ -4,7 +4,7 @@ module Api
     private
 
     def query_params
-      if ['Top Stories', 'Most Popular', 'Trending'].include? params[:section]
+      if ['Top Stories', 'Most Popular', 'Trending', 'Most Recent'].include? params[:section]
         params.permit(:url, :title)
       else
         params.permit(:section, :url, :title)
@@ -16,6 +16,8 @@ module Api
         :popularity.desc
       elsif params[:section] == 'Trending'
         :trending.desc
+      elsif params[:section] == 'Most Recent'
+        :created_date.desc
       else
         :score.desc
       end

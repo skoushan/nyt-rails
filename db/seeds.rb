@@ -5,6 +5,7 @@
 #
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
-Section.create(section: 'top stories', display_name: 'Top Stories', order:-2)
-Section.create(section: 'most popular', display_name: 'Most Popular', order: -1)
-Section.create(section: 'trending', display_name: 'Trending', order: 0)
+Section.create(section: 'top stories', display_name: 'Top Stories', order:-3)
+Section.create(section: 'most popular', display_name: 'Most Popular', order: -2)
+Section.create(section: 'trending', display_name: 'Trending', order: -1)
+Section.create(section: 'most recent', display_name: 'Most Recent', order: 0)
