@@ -32,6 +32,7 @@ namespace :scheduler do
   desc "Retrieves all the sections from the Newswire API."
   task retrieve_sections: :environment do
     Section.destroy_all
+    Rails.application.load_seed
     response = RestClient.get 'http://api.nytimes.com/svc/news/v3/content/section-list.json?api-key=5fa60494024b4c3c13ecb72011023ad8:11:69972922'
     response = JSON.parse(response)
     response['results'].each_with_index do |section|
@@ -111,11 +112,11 @@ namespace :scheduler do
       peak_pop = calculate_pop(article, 'peak', lowest)
       trending_factor = cur_pop - prev_pop
 
-      popularity = (3*cur_pop + trending_factor + peak_pop)/5
+      popularity = (3*cur_pop + trending_factor + peak_pop)/4
 
       recentness = (article[:created_date].to_f - oldest.to_f)/(newest.to_f - oldest.to_f)
 
-      score = (0.5*recentness + 0.1*popularity + 0.3*recentness*popularity)*1000000000000
+      score = (0.5*recentness + 0.2*popularity + 0.3*recentness*popularity)*1000000000000
       article['score'] = score
       article['popularity'] = popularity*1000000000000
       article['trending'] = trending_factor*1000000000000
